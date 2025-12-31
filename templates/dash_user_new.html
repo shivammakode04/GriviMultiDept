@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civic AI - Modern Complaint Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .sidebar-grad { background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%); }
+        .glass-card { background: white; border: 1px solid #e0e7ff; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border-radius: 1rem; }
+        .gradient-card { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); }
+        .nav-item.active { background: rgba(255,255,255,0.1); border-left: 4px solid #818cf8; color: white; }
+        [x-cloak] { display: none; }
+        .notification-badge { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+</head>
+<body class="bg-indigo-50 font-sans antialiased" x-data="dashboardApp()" x-cloak>
+    <!-- SIDEBAR -->
+    <aside class="w-72 sidebar-grad text-indigo-100 flex flex-col shadow-2xl fixed h-screen z-50">
+        <div class="p-6 border-b border-indigo-800/50 flex items-center gap-3">
+            <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                <i class="fas fa-hand-holding-heart"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Civic AI</h1>
+                <p class="text-[10px] uppercase tracking-wider text-indigo-300">Next Gen Reporting</p>
+            </div>
+        </div>
+
+        <nav class="p-4 space-y-2 flex-1">
+            <a @click="activeTab='dashboard'" :class="activeTab=='dashboard'?'active':''" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-indigo-900/50 transition nav-item">
+                <i class="fas fa-home w-5"></i> Dashboard
+            </a>
+            <a @click="activeTab='complaints'" :class="activeTab=='complaints'?'active':''" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-indigo-900/50 transition nav-item">
+                <i class="fas fa-list-check w-5"></i> My Complaints
+            </a>
+            <a @click="activeTab='file'" :class="activeTab=='file'?'active':''" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-indigo-900/50 transition nav-item">
+                <i class="fas fa-plus-circle w-5"></i> File New
+            </a>
+            <a @click="activeTab='analytics'" :class="activeTab=='analytics'?'active':''" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-indigo-900/50 transition nav-item">
+                <i class="fas fa-chart-bar w-5"></i> Analytics
+            </a>
+            <a @click="activeTab='badges'" :class="activeTab=='badges'?'active':''" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-indigo-900/50 transition nav-item">
+                <i class="fas fa-trophy w-5"></i> Achievements
+            </a>
+            <a href="{% url 'profile_view' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-indigo-900/50 transition nav-item">
+                <i class="fas fa-user-circle w-5"></i> Profile
+            </a>
+        </nav>
+
+        <div class="p-4 bg-indigo-900/30 border-t border-indigo-800/50 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-indigo-700 border-2 border-indigo-500 flex items-center justify-center font-bold text-white">
+                {{ user.username.0|upper }}
+            </div>
+            <div class="overflow-hidden">
+                <p class="text-sm font-bold text-white truncate">{{ user.username }}</p>
+                <p class="text-[10px] text-indigo-300">Active Citizen</p>
+            </div>
+            <a href="{% url 'user_logout' %}" class="ml-auto text-indigo-300 hover:text-white p-2 transition">
+                <i class="fas fa-power-off"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="ml-72 min-h-screen">
+        <!-- HEADER -->
+        <header class="bg-white/80 backdrop-blur border-b border-indigo-100 px-8 py-4 sticky top-0 z-30 shadow-sm">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800" x-text="getPageTitle()"></h2>
+                    <p class="text-xs text-slate-400 mt-1" x-text="`Last updated: ${new Date().toLocaleString()}`"></p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="bg-green-50 text-green-700 px-4 py-2 rounded-lg border border-green-100 text-xs font-bold flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Live in {{ user.city }}
+                    </div>
+                    <div class="relative" @click.outside="notifOpen=false">
+                        <button @click="notifOpen=!notifOpen" class="text-indigo-600 hover:text-indigo-800 text-xl relative">
+                            <i class="fas fa-bell"></i>
+                            {% if unread_count %}<span class="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full notification-badge"></span>{% endif %}
+                        </button>
+                        <div x-show="notifOpen" class="absolute right-0 mt-3 w-96 bg-white shadow-2xl border rounded-2xl p-4 z-50">
+                            <div class="px-3 py-2 border-b text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">📢 Updates</div>
+                            <div class="max-h-96 overflow-y-auto">
+                                {% for n in notifs %}
+                                    <div class="text-sm p-3 hover:bg-indigo-50 border-b last:border-0 rounded-lg cursor-pointer transition">
+                                        <p class="font-semibold text-slate-800">{{ n.title }}</p>
+                                        <p class="text-xs text-slate-600">{{ n.message }}</p>
+                                    </div>
+                                {% empty %}
+                                    <div class="text-sm p-4 text-center text-slate-400">No new updates</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD TAB -->
+        <div x-show="activeTab === 'dashboard'" class="p-8">
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">📊 Your Performance Overview</h3>
+                <div class="grid grid-cols-4 gap-6">
+                    <div class="glass-card p-6 hover:shadow-lg transition">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Total Complaints</p>
+                                <h3 class="text-3xl font-extrabold text-slate-800 mt-2">{{ metrics.total }}</h3>
+                                <p class="text-xs text-slate-500 mt-1">📈 Trending up</p>
+                            </div>
+                            <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-2xl">📝</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 hover:shadow-lg transition">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Pending</p>
+                                <h3 class="text-3xl font-extrabold text-orange-500 mt-2">{{ metrics.pending }}</h3>
+                                <p class="text-xs text-slate-500 mt-1">⏳ Awaiting action</p>
+                            </div>
+                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center text-2xl">⏱️</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 hover:shadow-lg transition">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Resolved</p>
+                                <h3 class="text-3xl font-extrabold text-green-500 mt-2">{{ metrics.closed }}</h3>
+                                <p class="text-xs text-slate-500 mt-1">✅ Verified solutions</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-2xl">✨</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-violet-600 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-indigo-200 uppercase">Your Level</p>
+                                <h3 class="text-2xl font-extrabold mt-2">{{ metrics.level }}</h3>
+                                <p class="text-[10px] mt-2 bg-white/20 inline-block px-2 py-1 rounded border border-white/10">{{ metrics.closed }} Verified</p>
+                            </div>
+                            <div class="text-5xl opacity-30">👑</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECENT ACTIVITY -->
+            <div class="glass-card p-6">
+                <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-history text-indigo-500"></i> Recent Activity
+                </h3>
+                <div class="space-y-4">
+                    {% for complaint in complaints|slice:":5" %}
+                    <div class="flex justify-between items-center py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition px-2 rounded-lg">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-100">#{{ complaint.ticket_id }}</span>
+                                <span class="text-xs text-slate-400">{{ complaint.created_at|date:"M d, h:i A" }}</span>
+                            </div>
+                            <p class="font-semibold text-slate-700">{{ complaint.title|truncatechars:50 }}</p>
+                            <p class="text-xs text-slate-500 mt-1">📍 {{ complaint.location_name }}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="badge" 
+                                :class="'{% if complaint.status == \"Closed\" %}badge-success{% elif complaint.status == \"Solved\" %}badge-info{% else %}badge-warning{% endif %}'">
+                                {{ complaint.status }}
+                            </span>
+                            <a href="{% url 'complaint_detail' complaint.id %}" class="btn btn-sm btn-outline">
+                                View <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPLAINTS TAB -->
+        <div x-show="activeTab === 'complaints'" class="p-8">
+            <div class="glass-card p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-slate-800 text-lg">📋 Your Complaints</h3>
+                    <a href="{% url 'search_complaints' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-search"></i> Advanced Search
+                    </a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-50 border-b">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-semibold text-slate-600">Ticket</th>
+                                <th class="px-4 py-3 text-left font-semibold text-slate-600">Description</th>
+                                <th class="px-4 py-3 text-left font-semibold text-slate-600">Status</th>
+                                <th class="px-4 py-3 text-left font-semibold text-slate-600">Priority</th>
+                                <th class="px-4 py-3 text-left font-semibold text-slate-600">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for complaint in complaints %}
+                            <tr class="border-b hover:bg-slate-50 transition">
+                                <td class="px-4 py-3"><span class="badge badge-primary">#{{ complaint.ticket_id }}</span></td>
+                                <td class="px-4 py-3">{{ complaint.title|truncatechars:40 }}</td>
+                                <td class="px-4 py-3">
+                                    <span class="badge {% if complaint.status == 'Closed' %}badge-success{% elif complaint.status == 'Solved' %}badge-info{% else %}badge-warning{% endif %}">
+                                        {{ complaint.status }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="badge {% if complaint.priority == 'Critical' %}badge-danger{% elif complaint.priority == 'High' %}badge-warning{% else %}badge-primary{% endif %}">
+                                        {{ complaint.priority }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <a href="{% url 'complaint_detail' complaint.id %}" class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs">View Details →</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="px-4 py-8 text-center text-slate-500">No complaints filed yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILE NEW COMPLAINT TAB -->
+        <div x-show="activeTab === 'file'" class="p-8">
+            <div class="max-w-2xl mx-auto glass-card p-8">
+                <h3 class="text-2xl font-bold text-slate-800 mb-6">📝 File a New Complaint</h3>
+                <form method="POST" action="{% url 'submit_complaint' %}" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">Title <span class="text-red-500">*</span></label>
+                        <input type="text" name="title" class="form-control" required placeholder="Brief title for complaint">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Category <span class="text-red-500">*</span></label>
+                        <select name="category" class="form-control" required>
+                            <option value="">Select Category</option>
+                            <option value="Road/Street">🛣️ Road/Street</option>
+                            <option value="Water/Sewage">💧 Water/Sewage</option>
+                            <option value="Electricity">⚡ Electricity</option>
+                            <option value="Garbage">🗑️ Garbage</option>
+                            <option value="Health">🏥 Health</option>
+                            <option value="Safety">🔐 Safety</option>
+                            <option value="Parks">🌳 Parks</option>
+                            <option value="Other">📌 Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Detailed Description <span class="text-red-500">*</span></label>
+                        <textarea name="description" class="form-control" required placeholder="Describe the issue in detail..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-label">Location Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="location_name" class="form-control" required placeholder="Area/Street name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Pincode <span class="text-red-500">*</span></label>
+                            <input type="text" name="pincode" class="form-control" required placeholder="6-digit pincode">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Upload Image</label>
+                        <input type="file" name="image" class="form-control" accept="image/*">
+                        <p class="text-xs text-slate-500 mt-2">Support images help us resolve faster</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-label">Latitude</label>
+                            <input type="number" name="latitude" class="form-control" step="0.0001" placeholder="(Optional)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Longitude</label>
+                            <input type="number" name="longitude" class="form-control" step="0.0001" placeholder="(Optional)">
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 text-sm text-indigo-700">
+                        <i class="fas fa-lightbulb mr-2"></i> <strong>Tip:</strong> Provide detailed information with photos for faster resolution
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-full btn-lg">
+                        <i class="fas fa-paper-plane"></i> Submit Complaint
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ANALYTICS TAB -->
+        <div x-show="activeTab === 'analytics'" class="p-8">
+            <div class="grid grid-cols-3 gap-6 mb-8">
+                <div class="glass-card p-6">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Resolution Rate</p>
+                    <h3 class="text-3xl font-extrabold text-green-500 mt-2">{{ metrics.closed }}%</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-4">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: {{ metrics.closed }}%"></div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Avg Rating</p>
+                    <h3 class="text-3xl font-extrabold text-yellow-500 mt-2">{{ metrics.avg_rating|floatformat:1 }}/5</h3>
+                    <p class="text-xs text-slate-500 mt-1">⭐ Based on feedback</p>
+                </div>
+
+                <div class="glass-card p-6">
+                    <p class="text-xs font-bold text-slate-400 uppercase">In Progress</p>
+                    <h3 class="text-3xl font-extrabold text-blue-500 mt-2">{{ metrics.in_progress }}</h3>
+                    <p class="text-xs text-slate-500 mt-1">⏳ Being worked on</p>
+                </div>
+            </div>
+
+            <div class="glass-card p-6">
+                <h3 class="font-bold text-slate-800 mb-4">📈 Status Distribution</h3>
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- BADGES TAB -->
+        <div x-show="activeTab === 'badges'" class="p-8">
+            <div class="grid grid-cols-3 gap-6">
+                <div class="glass-card p-6 text-center hover:shadow-lg transition">
+                    <div class="text-4xl mb-3">🥇</div>
+                    <h4 class="font-bold text-slate-800">First Reporter</h4>
+                    <p class="text-xs text-slate-500 mt-2">File your first complaint</p>
+                    <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 text-center opacity-50">
+                    <div class="text-4xl mb-3">🥈</div>
+                    <h4 class="font-bold text-slate-800">Civic Steward</h4>
+                    <p class="text-xs text-slate-500 mt-2">5+ resolved complaints</p>
+                    <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width: {{ (metrics.closed / 5 * 100)|min:100|floatformat:0 }}%"></div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 text-center opacity-50">
+                    <div class="text-4xl mb-3">🥉</div>
+                    <h4 class="font-bold text-slate-800">Community Leader</h4>
+                    <p class="text-xs text-slate-500 mt-2">15+ resolved complaints</p>
+                    <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full" style="width: {{ (metrics.closed / 15 * 100)|min:100|floatformat:0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function dashboardApp() {
+            return {
+                activeTab: 'dashboard',
+                notifOpen: false,
+                getPageTitle() {
+                    const titles = {
+                        'dashboard': '📊 Dashboard',
+                        'complaints': '📋 My Complaints',
+                        'file': '📝 File New Complaint',
+                        'analytics': '📈 Analytics',
+                        'badges': '🏆 Achievements'
+                    };
+                    return titles[this.activeTab] || 'Dashboard';
+                }
+            };
+        }
+
+        // Initialize Chart.js
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('statusChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Pending', 'In Progress', 'Solved', 'Closed'],
+                        datasets: [{
+                            data: [
+                                {{ metrics.pending }},
+                                {{ metrics.in_progress }},
+                                {{ metrics.solved }},
+                                {{ metrics.closed }}
+                            ],
+                            backgroundColor: [
+                                '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

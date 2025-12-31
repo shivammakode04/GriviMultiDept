@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Profile Settings | Civic AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* DYNAMIC THEME ENGINE */
+        .theme-citizen { 
+            --primary: #4f46e5; /* Indigo-600 */
+            --primary-hover: #4338ca; 
+            --bg-grad: linear-gradient(135deg, #4338ca 0%, #312e81 100%);
+            --light-bg: #e0e7ff; 
+            --border-col: #c7d2fe;
+        }
+        .theme-admin { 
+            --primary: #0f172a; /* Slate-900 */
+            --primary-hover: #1e293b;
+            --bg-grad: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            --light-bg: #f1f5f9;
+            --border-col: #cbd5e1;
+        }
+
+        /* Applying Variables */
+        .sidebar-grad { background: var(--bg-grad); }
+        .btn-primary { background-color: var(--primary); }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .icon-primary { color: var(--primary); }
+        .bg-light-accent { background-color: var(--light-bg); }
+        .border-accent { border-color: var(--border-col); }
+
+        .glass-card { 
+            background: white; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); 
+            border-radius: 1rem; 
+        }
+        
+        .nav-item.active { 
+            background: rgba(255,255,255,0.15); 
+            border-left: 4px solid #60a5fa; 
+            color: white; 
+        }
+        [x-cloak] { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans antialiased flex h-screen overflow-hidden {% if user.is_department_admin %}theme-admin{% else %}theme-citizen{% endif %}">
+
+    <aside class="w-72 sidebar-grad text-slate-100 flex flex-col shadow-2xl z-20">
+        <div class="p-6 border-b border-white/10 flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg border border-white/5">
+                {% if user.is_department_admin %}
+                    <i class="fas fa-building"></i>
+                {% else %}
+                    <i class="fas fa-hand-holding-heart"></i>
+                {% endif %}
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-wide">Civic AI</h1>
+                <p class="text-[10px] uppercase tracking-wider opacity-70">
+                    {% if user.is_department_admin %}Official Admin{% else %}Citizen Portal{% endif %}
+                </p>
+            </div>
+        </div>
+
+        <nav class="p-4 space-y-2 flex-1">
+            <a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-white/10 transition text-slate-200 hover:text-white">
+                <i class="fas fa-th-large w-5"></i> Dashboard
+            </a>
+            
+            {% if not user.is_department_admin %}
+            <a href="{% url 'submit_complaint' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-white/10 transition text-slate-200 hover:text-white">
+                <i class="fas fa-plus-circle w-5"></i> File Complaint
+            </a>
+            {% endif %}
+
+            <a href="#" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold cursor-pointer">
+                <i class="fas fa-user-cog w-5"></i> Profile Settings
+            </a>
+        </nav>
+
+        <div class="p-4 bg-black/20 border-t border-white/5 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center font-bold text-white shadow-inner">
+                {{ user.username.0|upper }}
+            </div>
+            <div class="overflow-hidden">
+                <p class="text-sm font-bold text-white truncate">{{ user.username }}</p>
+                <p class="text-[10px] opacity-60 truncate">{{ user.city }}</p>
+            </div>
+            <a href="{% url 'user_logout' %}" class="ml-auto text-red-300 hover:text-red-400 hover:bg-white/5 p-2 rounded-lg transition" title="Logout">
+                <i class="fas fa-power-off"></i>
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto relative">
+        <header class="bg-white/80 backdrop-blur border-b border-slate-200 px-8 py-4 sticky top-0 z-30 flex justify-between items-center shadow-sm">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-user-circle icon-primary"></i> 
+                    {% if user.is_department_admin %}Admin Profile{% else %}My Profile{% endif %}
+                </h2>
+                <p class="text-sm text-slate-500 mt-0.5">Manage your personal information & security</p>
+            </div>
+        </header>
+
+        <div class="p-8 max-w-5xl mx-auto space-y-6">
+            
+            <div class="glass-card p-8 bg-gradient-to-r from-white to-slate-50 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-light-accent rounded-bl-full opacity-50"></div>
+
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10">
+                    <div class="flex flex-col items-center relative group">
+                        <div class="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-slate-200 relative">
+                            {% if user.profile_pic %}
+                            <img src="{{ user.profile_pic.url }}" class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-5xl font-bold text-slate-400">{{ user.username.0|upper }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <label onclick="document.getElementById('picInput').click()" class="absolute bottom-1 right-1 cursor-pointer hover:scale-110 transition shadow-lg">
+                            <div class="w-10 h-10 rounded-full btn-primary flex items-center justify-center text-white border-2 border-white">
+                                <i class="fas fa-camera text-sm"></i>
+                            </div>
+                        </label>
+
+                        <form action="{% url 'update_profile' %}" method="POST" enctype="multipart/form-data" id="picForm">
+                            {% csrf_token %}
+                            <input type="file" id="picInput" name="profile_pic" class="hidden" accept="image/*" onchange="document.getElementById('picForm').submit()">
+                        </form>
+                    </div>
+
+                    <div class="flex-1 text-center md:text-left">
+                        <h1 class="text-3xl font-extrabold text-slate-800">{{ user.first_name }} {{ user.last_name }}</h1>
+                        <p class="text-sm font-bold icon-primary mt-1">@{{ user.username }}</p>
+                        
+                        <div class="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
+                            <div class="bg-white border rounded-lg px-3 py-1.5 shadow-sm">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Role</p>
+                                <p class="text-sm font-bold text-slate-700">{% if user.is_department_admin %}Dept. Official{% else %}Active Citizen{% endif %}</p>
+                            </div>
+                            <div class="bg-white border rounded-lg px-3 py-1.5 shadow-sm">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Jurisdiction</p>
+                                <p class="text-sm font-bold text-slate-700">{{ user.city }}</p>
+                            </div>
+                            {% if user.is_department_admin %}
+                            <div class="bg-white border rounded-lg px-3 py-1.5 shadow-sm">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Department</p>
+                                <p class="text-sm font-bold text-slate-700">{{ user.department_name }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form action="{% url 'update_profile' %}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="glass-card p-8">
+                    <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 border-b pb-2">
+                        <i class="fas fa-id-card icon-primary"></i> Personal Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">First Name</label>
+                            <input type="text" name="first_name" value="{{ user.first_name }}" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="John">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Last Name</label>
+                            <input type="text" name="last_name" value="{{ user.last_name }}" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Doe">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Phone Number</label>
+                            <input type="text" name="phone" value="{{ user.phone|default:'' }}" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="+91 999...">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Aadhar ID (Govt Verified)</label>
+                            <input type="text" name="aadhar_id" value="{{ user.aadhar_id|default:'' }}" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="XXXX-XXXX-XXXX">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8">
+                    <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 border-b pb-2">
+                        <i class="fas fa-map-marker-alt icon-primary"></i> Location & Address
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">City (Locked)</label>
+                            <input type="text" name="city" value="{{ user.city }}" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed" readonly title="Contact Super Admin to change City">
+                            <p class="text-[10px] text-slate-400 mt-1">Cannot change jurisdiction manually.</p>
+                        </div>
+                        
+                        {% if user.is_department_admin %}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Department (Locked)</label>
+                            <input type="text" value="{{ user.department_name }}" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed" readonly>
+                        </div>
+                        {% endif %}
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Full Address</label>
+                            <textarea name="address" rows="3" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition resize-none" placeholder="Enter residential or office address...">{{ user.address|default:'' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-4 pb-8">
+                    <a href="{% url 'dashboard' %}" class="px-8 py-3 rounded-lg font-bold text-slate-600 border border-slate-300 hover:bg-slate-50 transition">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-8 py-3 rounded-lg font-bold text-white btn-primary shadow-lg transition transform hover:-translate-y-0.5 flex items-center gap-2">
+                        <i class="fas fa-save"></i> Save Updates
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>

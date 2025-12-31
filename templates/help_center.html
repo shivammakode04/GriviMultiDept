@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center - Civic AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto p-8" x-data="{ openFAQ: null }">
+        <div class="mb-12 text-center">
+            <h1 class="text-4xl font-bold text-gray-800">❓ Help Center</h1>
+            <p class="text-gray-600 mt-2">Find answers to common questions</p>
+        </div>
+
+        <!-- SEARCH -->
+        <div class="mb-8">
+            <input type="text" placeholder="Search help articles..." class="w-full p-4 border-2 border-gray-300 rounded-lg text-lg focus:border-blue-600 focus:outline-none">
+        </div>
+
+        <!-- FAQ CATEGORIES -->
+        <div class="grid grid-cols-3 gap-4 mb-12">
+            <div class="bg-white rounded-lg shadow p-6 text-center hover:shadow-lg transition cursor-pointer">
+                <p class="text-3xl mb-2">📝</p>
+                <p class="font-semibold text-gray-800">Filing Complaints</p>
+                <p class="text-sm text-gray-600 mt-2">Learn how to file</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center hover:shadow-lg transition cursor-pointer">
+                <p class="text-3xl mb-2">📍</p>
+                <p class="font-semibold text-gray-800">Tracking</p>
+                <p class="text-sm text-gray-600 mt-2">Monitor your cases</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center hover:shadow-lg transition cursor-pointer">
+                <p class="text-3xl mb-2">🏆</p>
+                <p class="font-semibold text-gray-800">Badges</p>
+                <p class="text-sm text-gray-600 mt-2">Earn achievements</p>
+            </div>
+        </div>
+
+        <!-- FAQ ACCORDION -->
+        <div class="space-y-4">
+            {% for faq in faqs %}
+            <div class="bg-white rounded-lg shadow">
+                <button @click="openFAQ = openFAQ === {{ forloop.counter }} ? null : {{ forloop.counter }}" class="w-full p-6 text-left flex justify-between items-center hover:bg-gray-50 transition">
+                    <span class="font-semibold text-gray-800">{{ faq.question }}</span>
+                    <i class="fas fa-chevron-down" :class="openFAQ === {{ forloop.counter }} ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="openFAQ === {{ forloop.counter }}" class="px-6 pb-6 text-gray-700 border-t">
+                    {{ faq.answer }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- CONTACT SUPPORT -->
+        <div class="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
+            <p class="text-lg font-semibold text-gray-800 mb-4">Still need help?</p>
+            <p class="text-gray-600 mb-6">Contact our support team for assistance</p>
+            <a href="mailto:support@civicai.com" class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700">
+                <i class="fas fa-envelope"></i> Email Support
+            </a>
+        </div>
+    </div>
+</body>
+</html>

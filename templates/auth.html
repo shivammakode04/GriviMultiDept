@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civic AI - Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- STYLES --- */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .blob {
+            position: absolute;
+            filter: blur(50px);
+            z-index: -1;
+            opacity: 0.7;
+            animation: move 8s infinite alternate;
+        }
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(20px, -20px) scale(1.1); }
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #2563eb, #9333ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased overflow-hidden relative h-screen w-full flex items-center justify-center">
+
+    <div class="blob bg-blue-300 w-96 h-96 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
+    <div class="blob bg-purple-300 w-96 h-96 rounded-full bottom-0 right-0 translate-x-1/2 translate-y-1/2"></div>
+    <div class="blob bg-pink-200 w-72 h-72 rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-50"></div>
+
+    <div id="app" class="w-full max-w-7xl mx-auto p-4 flex flex-col items-center justify-center h-full">
+        
+        <div id="screen-welcome" class="text-center fade-in max-w-2xl">
+            <div class="mb-6 inline-block p-5 rounded-full bg-white/80 shadow-lg backdrop-blur-sm">
+                <i class="fas fa-city text-5xl text-blue-600"></i>
+            </div>
+            <h1 class="text-6xl font-extrabold mb-4 tracking-tight">Civic <span class="gradient-text">AI</span></h1>
+            <p class="text-xl text-gray-600 mb-10 leading-relaxed font-light">
+                Next-Gen Governance Portal.<br>
+                Report issues. Track progress. Verify solutions.
+            </p>
+            
+            <button onclick="navigate('screen-roles')" class="group relative px-8 py-4 bg-blue-600 text-white font-bold rounded-full shadow-2xl hover:bg-blue-700 transition transform hover:scale-105 z-50 cursor-pointer">
+                <span class="mr-2">Get Started</span>
+                <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </div>
+
+        <div id="screen-roles" class="hidden w-full max-w-4xl fade-in">
+            <h2 class="text-3xl font-bold text-center mb-10 text-gray-700">Select Your Profile</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div onclick="openAuth('user')" class="glass p-10 rounded-3xl cursor-pointer hover:bg-white/60 transition transform hover:-translate-y-2 group border-t-4 border-transparent hover:border-blue-500">
+                    <div class="h-20 w-20 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors mx-auto md:mx-0">
+                        <i class="fas fa-user text-3xl text-blue-600 group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Citizen</h3>
+                    <p class="text-gray-500 text-sm">Report issues, track complaints, and help improve your city.</p>
+                </div>
+
+                <div onclick="openAuth('admin')" class="glass p-10 rounded-3xl cursor-pointer hover:bg-white/60 transition transform hover:-translate-y-2 group border-t-4 border-transparent hover:border-purple-500">
+                    <div class="h-20 w-20 bg-purple-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-600 transition-colors mx-auto md:mx-0">
+                        <i class="fas fa-user-shield text-3xl text-purple-600 group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Official Admin</h3>
+                    <p class="text-gray-500 text-sm">Manage department complaints, update status, and verify fixes.</p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-10">
+                <button onclick="navigate('screen-welcome')" class="text-gray-500 hover:text-gray-800 font-semibold transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Home
+                </button>
+            </div>
+        </div>
+
+        <div id="screen-auth" class="hidden w-full max-w-lg fade-in glass p-8 rounded-[2rem] shadow-2xl relative">
+            
+            <div class="text-center mb-6">
+                <h2 id="auth-title" class="text-2xl font-bold text-gray-800">Welcome Back</h2>
+                <p id="auth-subtitle" class="text-sm text-gray-500">Please enter your details</p>
+                
+                {% if error %}
+                <div class="mt-2 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm font-bold animate-pulse">
+                    ⚠️ {{ error }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="flex bg-gray-100/80 p-1.5 rounded-xl mb-6 shadow-inner">
+                <button onclick="toggleMode('login')" id="tab-login" class="flex-1 py-2.5 rounded-lg text-sm font-bold bg-white shadow text-blue-600 transition-all">Log In</button>
+                <button onclick="toggleMode('signup')" id="tab-signup" class="flex-1 py-2.5 rounded-lg text-sm font-bold text-gray-500 hover:text-gray-700 transition-all">Sign Up</button>
+            </div>
+
+            <form method="POST" class="max-h-[450px] overflow-y-auto custom-scroll pr-2">
+                {% csrf_token %}
+                <input type="hidden" name="action" id="form-action" value="login">
+                <input type="hidden" name="role" id="form-role" value="user">
+
+                <div id="login-section" class="space-y-4">
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-4 top-4 text-gray-400"></i>
+                        <input type="text" name="username" placeholder="Username" class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/70 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none transition">
+                    </div>
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-4 top-4 text-gray-400"></i>
+                        <input type="password" name="password" placeholder="Password" class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/70 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none transition">
+                    </div>
+                    <div class="text-right">
+                        <a href="{% url 'password_reset' %}" class="text-xs font-bold text-blue-600 hover:underline">Forgot Password?</a>
+                    </div>
+                </div>
+
+                <div id="signup-section" class="space-y-4 hidden">
+                    
+                    <div id="admin-dept-field" class="hidden">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Department</label>
+                        <select name="department" class="w-full px-4 py-3 rounded-xl bg-white/70 border border-gray-100 outline-none">
+                            <option value="Municipal">Municipal Corp</option>
+                            <option value="PWD">PWD (Roads)</option>
+                            <option value="Electricity">Electricity Dept</option>
+                            <option value="Water">Water Dept</option>
+                            <option value="Police">Police</option>
+                            <option value="Health">Health Dept</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" name="username" placeholder="New Username" class="w-full px-4 py-3 rounded-xl bg-white/70 border border-gray-100 outline-none">
+                        <input type="password" name="password" placeholder="Create Password" class="w-full px-4 py-3 rounded-xl bg-white/70 border border-gray-100 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" name="phone" placeholder="Mobile Number" class="w-full px-4 py-3 rounded-xl bg-white/70 border border-gray-100 outline-none">
+                        <input type="text" name="city" placeholder="City Name" class="w-full px-4 py-3 rounded-xl bg-white/70 border border-gray-100 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" name="aadhar_id" placeholder="Aadhar ID" class="w-full px-4 py-3 rounded-xl bg-white/70 border border-gray-100 outline-none">
+                        <select name="gender" class="w-full px-4 py-3 rounded-xl bg-white/70 border border-gray-100 outline-none text-gray-600">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <input type="date" name="dob" class="w-full px-4 py-3 rounded-xl bg-white/70 border border-gray-100 outline-none text-gray-500">
+                    <textarea name="address" placeholder="Residential Address" class="w-full px-4 py-3 rounded-xl bg-white/70 border border-gray-100 outline-none h-20 resize-none"></textarea>
+                </div>
+
+                <button type="submit" id="submit-btn" class="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition transform hover:scale-[1.02] active:scale-95">
+                    Secure Login
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <button onclick="navigate('screen-roles')" class="text-xs text-gray-400 hover:text-gray-600 font-medium">
+                    Change Role
+                </button>
+            </div>
+        </div>
+
+    </div>
+<script>
+        // GLOBAL STATE
+        let currentRole = 'user'; 
+        let currentMode = 'login'; 
+
+        // 1. Navigation
+        function navigate(screenId) {
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('screen-roles').classList.add('hidden');
+            document.getElementById('screen-auth').classList.add('hidden');
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        // 2. Open Auth Screen
+        function openAuth(role) {
+            currentRole = role;
+            currentMode = 'login'; 
+            document.getElementById('form-role').value = role;
+            navigate('screen-auth');
+            // CRITICAL: Update UI immediately when opening screen
+            updateUI();
+        }
+
+        // 3. Toggle Mode
+        function toggleMode(mode) {
+            currentMode = mode;
+            document.getElementById('form-action').value = mode;
+            updateUI();
+        }
+
+        // 4. Update UI & Input Logic
+        function updateUI() {
+            const title = document.getElementById('auth-title');
+            const submitBtn = document.getElementById('submit-btn');
+            const tabLogin = document.getElementById('tab-login');
+            const tabSignup = document.getElementById('tab-signup');
+            
+            const loginSec = document.getElementById('login-section');
+            const signupSec = document.getElementById('signup-section');
+            const adminDept = document.getElementById('admin-dept-field');
+
+            // Select ALL inputs
+            const loginInputs = loginSec.querySelectorAll('input');
+            const signupInputs = signupSec.querySelectorAll('input, select, textarea');
+
+            // --- THEME & TEXT ---
+            if (currentRole === 'admin') {
+                title.innerText = currentMode === 'login' ? "Admin Login" : "Official Registration";
+                title.className = "text-2xl font-bold text-purple-700";
+            } else {
+                title.innerText = currentMode === 'login' ? "Citizen Login" : "Create Profile";
+                title.className = "text-2xl font-bold text-blue-700";
+            }
+
+            const activeClass = currentRole === 'admin' ? "bg-white text-purple-600 shadow-md" : "bg-white text-blue-600 shadow-md";
+            const btnGradient = currentRole === 'admin' ? "bg-gradient-to-r from-purple-600 to-pink-600" : "bg-gradient-to-r from-blue-600 to-indigo-600";
+
+            // --- LOGIC: LOGIN MODE ---
+            if (currentMode === 'login') {
+                tabLogin.className = `flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${activeClass}`;
+                tabSignup.className = "flex-1 py-2.5 rounded-lg text-sm font-bold text-gray-500 hover:text-gray-700 transition-all";
+                
+                loginSec.classList.remove('hidden');
+                signupSec.classList.add('hidden');
+                submitBtn.innerText = "Secure Login";
+
+                // ENABLE Login inputs, DISABLE Signup inputs (So they don't get sent)
+                loginInputs.forEach(el => el.disabled = false);
+                signupInputs.forEach(el => el.disabled = true);
+            } 
+            // --- LOGIC: SIGNUP MODE ---
+            else {
+                tabSignup.className = `flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${activeClass}`;
+                tabLogin.className = "flex-1 py-2.5 rounded-lg text-sm font-bold text-gray-500 hover:text-gray-700 transition-all";
+                
+                loginSec.classList.add('hidden');
+                signupSec.classList.remove('hidden');
+                submitBtn.innerText = "Register Account";
+
+                // DISABLE Login inputs, ENABLE Signup inputs
+                loginInputs.forEach(el => el.disabled = true);
+                signupInputs.forEach(el => el.disabled = false);
+
+                if (currentRole === 'admin') {
+                    adminDept.classList.remove('hidden');
+                } else {
+                    adminDept.classList.add('hidden');
+                }
+            }
+            submitBtn.className = `w-full mt-6 text-white font-bold py-3.5 rounded-xl shadow-lg transition transform hover:scale-[1.02] active:scale-95 ${btnGradient}`;
+        }
+
+        // 5. INITIALIZE ON LOAD
+        // Ensures inputs are correctly disabled even if the user refreshes
+        window.onload = function() {
+            updateUI(); 
+        };
+    </script>
+  
+</body>
+</html>

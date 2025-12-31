@@ -1,0 +1,421 @@
+text,label,priority
+maintenance sweep urgent,PWD,Low
+light battery,Fire,Low
+fire safety training,Fire,Low
+dead bird disease,Health Department,High
+Issue: electric pole down,Electricity,High
+live wire on road reported,Electricity,High
+sanitation training urgent,Health Department,Low
+Issue: road subsidence,PWD,High
+exit door repair urgent,Fire,Low
+rash driving school urgent,Police/Traffic,Medium
+bench repair,Municipality,Low
+clinic calibration,Health Department,Low
+assault victim urgent,Police/Traffic,High
+street clean urgent,Municipality,Medium
+dog attack animal reported,Health Department,High
+accident multiple injuries urgent,Police/Traffic,High
+tree pruning reported,Municipality,Low
+health awareness,Health Department,Low
+tank paint urgent,Water,Low
+food poison outbreak,Health Department,High
+bulb replacement urgent,Electricity,Low
+electrical burning urgent,Fire,Medium
+Issue: crack in box,Electricity,Low
+electrical burning reported,Fire,Medium
+alarm not working reported,Fire,Medium
+pole tilt urgent,Electricity,Low
+safety sign replace,Fire,Low
+Issue: bulb replacement,Electricity,Low
+water supply cut,Water,High
+Issue: two wheeler stolen,Police/Traffic,Medium
+Issue: molestation reported,Police/Traffic,High
+noise pollution urgent,Police/Traffic,Medium
+illegal construction reported,Municipality,High
+tree branches danger urgent,Municipality,Medium
+mosquito breeding reported,Health Department,Medium
+Issue: rash driving school,Police/Traffic,Medium
+dustbin overflow reported,Municipality,Medium
+minor pothole urgent,PWD,Low
+Issue: mark lines faded,Police/Traffic,Low
+illegal parking,Police/Traffic,Medium
+dengue outbreak vector reported,Health Department,High
+tank rupture flood urgent,Water,High
+path uneven falls reported,PWD,Medium
+Issue: tree branches danger,Municipality,Medium
+alarm not working urgent,Fire,Medium
+Issue: illegal construction,Municipality,High
+Issue: encroachment road,Municipality,High
+two wheeler stolen reported,Police/Traffic,Medium
+road cracked urgent,PWD,Medium
+Issue: sign faded,PWD,Low
+signal light dirty reported,Police/Traffic,Low
+dangling wire reported,Electricity,Medium
+parking mark urgent,Police/Traffic,Low
+Issue: fire safety training,Fire,Low
+Issue: signal light dirty,Police/Traffic,Low
+Issue: loose connection,Electricity,Medium
+meter broken urgent,Electricity,Medium
+Issue: robbery incident,Police/Traffic,High
+sparking transformer,Electricity,High
+water discolored,Water,Medium
+noise pollution reported,Police/Traffic,Medium
+Issue: dusty fixture,Electricity,Low
+Issue: equipment maintenance,Fire,Low
+vehicle theft urgent,Police/Traffic,High
+loose connection reported,Electricity,Medium
+Issue: potholes repair,PWD,Medium
+paint fading reported,Electricity,Low
+stray dogs nuisance,Health Department,Medium
+irregular supply hours urgent,Water,Medium
+Issue: contaminated water,Water,High
+power tripping reported,Electricity,Medium
+food stall license urgent,Health Department,Medium
+Issue: sidewalk broken,PWD,Medium
+sewage overflow disease reported,Water,High
+Issue: mosquito breeding,Health Department,Medium
+pharmacy expired,Health Department,Medium
+crack in box urgent,Electricity,Low
+Issue: road cracked,PWD,Medium
+potholes repair urgent,PWD,Medium
+park encroachment,Municipality,Medium
+health inspection urgent,Health Department,Low
+Issue: meter broken,Electricity,Medium
+contaminated water,Water,High
+accident multiple injuries reported,Police/Traffic,High
+gas cylinder blast,Fire,High
+dead bird disease urgent,Health Department,High
+tap broken,Water,Medium
+tank rupture flood,Water,High
+bridge crack structural,PWD,High
+Issue: signal broken jam,Police/Traffic,Medium
+electric pole down reported,Electricity,High
+sewage overflow disease urgent,Water,High
+Issue: water discolored,Water,Medium
+food poison outbreak urgent,Health Department,High
+minor pothole reported,PWD,Low
+sewage overflow disease,Water,High
+dog attack animal urgent,Health Department,High
+mark lines faded,Police/Traffic,Low
+sparking transformer reported,Electricity,High
+health checkup urgent,Health Department,Low
+equipment maintenance urgent,Fire,Low
+road cracked reported,PWD,Medium
+minor repair reported,Water,Low
+water supply cut urgent,Water,High
+tank not maintained reported,Water,Medium
+contaminated water reported,Water,High
+Issue: sparking transformer,Electricity,High
+two wheeler stolen urgent,Police/Traffic,Medium
+loose connection urgent,Electricity,Medium
+sign damaged urgent,Police/Traffic,Low
+Issue: food poison outbreak,Health Department,High
+malaria cases,Health Department,Medium
+Issue: stray dogs nuisance,Health Department,Medium
+Issue: health inspection,Health Department,Low
+equipment maintenance reported,Fire,Low
+helmet awareness urgent,Police/Traffic,Low
+tank not maintained urgent,Water,Medium
+tap broken urgent,Water,Medium
+dengue outbreak vector urgent,Health Department,High
+Issue: electrical burning,Fire,Medium
+bridge crack structural reported,PWD,High
+vehicle theft urgent reported,Police/Traffic,High
+meter servicing,Water,Low
+path uneven falls urgent,PWD,Medium
+parking mark reported,Police/Traffic,Low
+dog attack animal,Health Department,High
+gas cylinder blast urgent,Fire,High
+street clean reported,Municipality,Medium
+water discolored urgent,Water,Medium
+garbage outbreak urgent,Municipality,High
+signal light dirty,Police/Traffic,Low
+divider damaged urgent,PWD,Medium
+major pothole accident,PWD,High
+Issue: vehicle theft urgent,Police/Traffic,High
+building fire trapped,Fire,High
+sewage overflow,Municipality,High
+Issue: minor pothole,PWD,Low
+road damage traffic,PWD,High
+fire safety training urgent,Fire,Low
+dustbin overflow,Municipality,Medium
+Issue: parking mark,Police/Traffic,Low
+beautification urgent,Municipality,Low
+manhole cover missing,PWD,High
+sign faded,PWD,Low
+old line replace urgent,Water,Low
+Issue: hospital power outage,Electricity,High
+two wheeler stolen,Police/Traffic,Medium
+tap handle fix reported,Water,Low
+Issue: garbage outbreak,Municipality,High
+sanitation training,Health Department,Low
+food unhygienic urgent,Health Department,High
+fire safety training reported,Fire,Low
+dustbin replace urgent,Municipality,Low
+fire residential urgent,Fire,High
+Issue: divider damaged,PWD,Medium
+illegal construction,Municipality,High
+fire residential reported,Fire,High
+Issue: power tripping,Electricity,Medium
+chemical fire warehouse reported,Fire,High
+Issue: meter servicing,Water,Low
+sanitation training reported,Health Department,Low
+power tripping urgent,Electricity,Medium
+street clean,Municipality,Medium
+equipment maintenance,Fire,Low
+minor repair urgent,Water,Low
+fire safety audit,Fire,Medium
+tap broken reported,Water,Medium
+Issue: grass cutting,Municipality,Low
+sign faded reported,PWD,Low
+sign damaged reported,Police/Traffic,Low
+Issue: health awareness,Health Department,Low
+paint fading,Electricity,Low
+minor repair,Water,Low
+Issue: helmet awareness,Police/Traffic,Low
+water pipeline rupture reported,Water,High
+Issue: dustbin overflow,Municipality,Medium
+Issue: illegal parking,Police/Traffic,Medium
+illegal parking reported,Police/Traffic,Medium
+light battery reported,Fire,Low
+lane marking repaint,PWD,Low
+lane marking repaint urgent,PWD,Low
+asphalt patch reported,PWD,Low
+food stall license,Health Department,Medium
+gas cylinder blast reported,Fire,High
+water pipeline rupture,Water,High
+Issue: accident multiple injuries,Police/Traffic,High
+park encroachment urgent,Municipality,Medium
+irregular supply hours,Water,Medium
+electric pole down,Electricity,High
+alarm not working,Fire,Medium
+road subsidence reported,PWD,High
+bench repair reported,Municipality,Low
+explosion petrol pump urgent,Fire,High
+Issue: fire safety audit,Fire,Medium
+hospital power outage reported,Electricity,High
+open dump hazard urgent,Municipality,High
+explosion petrol pump reported,Fire,High
+potholes repair,PWD,Medium
+tree branches danger reported,Municipality,Medium
+signal broken jam urgent,Police/Traffic,Medium
+malaria cases reported,Health Department,Medium
+health inspection,Health Department,Low
+irregular supply hours reported,Water,Medium
+smoke basement,Fire,Medium
+Issue: building fire trapped,Fire,High
+encroachment road,Municipality,High
+meter broken reported,Electricity,Medium
+Issue: old line replace,Water,Low
+assault victim,Police/Traffic,High
+health checkup,Health Department,Low
+Issue: tank not maintained,Water,Medium
+Issue: smoke basement,Fire,Medium
+Issue: sign damaged,Police/Traffic,Low
+meter servicing reported,Water,Low
+sewage overflow reported,Municipality,High
+major pothole accident reported,PWD,High
+Issue: exit door repair,Fire,Low
+garbage outbreak reported,Municipality,High
+safety sign replace reported,Fire,Low
+Issue: open dump hazard,Municipality,High
+no fire extinguisher reported,Fire,Medium
+stray dogs nuisance urgent,Health Department,Medium
+explosion petrol pump,Fire,High
+Issue: noise pollution,Police/Traffic,Medium
+Issue: lane marking repaint,PWD,Low
+Issue: gas cylinder blast,Fire,High
+Issue: sewage overflow disease,Water,High
+bulb replacement reported,Electricity,Low
+Issue: dustbin replace,Municipality,Low
+vehicle theft urgent urgent,Police/Traffic,High
+sign damaged,Police/Traffic,Low
+Issue: food stall license,Health Department,Medium
+clinic calibration reported,Health Department,Low
+road subsidence,PWD,High
+malaria cases urgent,Health Department,Medium
+Issue: beautification,Municipality,Low
+hospital power outage urgent,Electricity,High
+road cracked,PWD,Medium
+robbery incident,Police/Traffic,High
+Issue: road damage traffic,PWD,High
+street light off urgent,Electricity,Medium
+street light off,Electricity,Medium
+food poison outbreak reported,Health Department,High
+illegal parking urgent,Police/Traffic,Medium
+Issue: dead bird disease,Health Department,High
+Issue: dog attack animal,Health Department,High
+short circuit fire risk reported,Electricity,High
+water pipeline rupture urgent,Water,High
+mosquito breeding urgent,Health Department,Medium
+sidewalk broken reported,PWD,Medium
+divider damaged,PWD,Medium
+minor pothole,PWD,Low
+tank not maintained,Water,Medium
+asphalt patch urgent,PWD,Low
+smoke basement reported,Fire,Medium
+electric pole down urgent,Electricity,High
+dead bird disease reported,Health Department,High
+mark lines faded urgent,Police/Traffic,Low
+live wire on road,Electricity,High
+water pipe leak reported,Water,Medium
+Issue: bridge crack structural,PWD,High
+health awareness urgent,Health Department,Low
+park encroachment reported,Municipality,Medium
+stray dogs nuisance reported,Health Department,Medium
+noise pollution,Police/Traffic,Medium
+crack in box reported,Electricity,Low
+Issue: food unhygienic,Health Department,High
+Issue: tap broken,Water,Medium
+food unhygienic,Health Department,High
+tree pruning urgent,Municipality,Low
+live wire on road urgent,Electricity,High
+exit door repair,Fire,Low
+water pipe leak,Water,Medium
+lane marking repaint reported,PWD,Low
+open dump hazard,Municipality,High
+beautification reported,Municipality,Low
+garbage not collected,Municipality,Medium
+fire safety audit urgent,Fire,Medium
+encroachment road urgent,Municipality,High
+dusty fixture reported,Electricity,Low
+sparking transformer urgent,Electricity,High
+accident multiple injuries,Police/Traffic,High
+food stall license reported,Health Department,Medium
+Issue: asphalt patch,PWD,Low
+Issue: manhole cover missing,PWD,High
+road subsidence urgent,PWD,High
+dangling wire,Electricity,Medium
+garbage not collected urgent,Municipality,Medium
+Issue: garbage not collected,Municipality,Medium
+tank rupture flood reported,Water,High
+dusty fixture,Electricity,Low
+power tripping,Electricity,Medium
+pole tilt reported,Electricity,Low
+dengue outbreak vector,Health Department,High
+mosquito breeding,Health Department,Medium
+water supply cut reported,Water,High
+no fire extinguisher,Fire,Medium
+garbage not collected reported,Municipality,Medium
+sidewalk broken,PWD,Medium
+health checkup reported,Health Department,Low
+Issue: path uneven falls,PWD,Medium
+Issue: health checkup,Health Department,Low
+assault victim reported,Police/Traffic,High
+Issue: pharmacy expired,Health Department,Medium
+Issue: park encroachment,Municipality,Medium
+robbery incident reported,Police/Traffic,High
+dustbin replace,Municipality,Low
+garbage outbreak,Municipality,High
+contaminated water urgent,Water,High
+maintenance sweep reported,PWD,Low
+potholes repair reported,PWD,Medium
+Issue: dengue outbreak vector,Health Department,High
+Issue: explosion petrol pump,Fire,High
+Issue: fire residential,Fire,High
+health awareness reported,Health Department,Low
+tank paint,Water,Low
+dangling wire urgent,Electricity,Medium
+molestation reported urgent,Police/Traffic,High
+sidewalk broken urgent,PWD,Medium
+signal light dirty urgent,Police/Traffic,Low
+Issue: bench repair,Municipality,Low
+tap handle fix urgent,Water,Low
+meter broken,Electricity,Medium
+mark lines faded reported,Police/Traffic,Low
+tree branches danger,Municipality,Medium
+clinic calibration urgent,Health Department,Low
+molestation reported reported,Police/Traffic,High
+grass cutting urgent,Municipality,Low
+asphalt patch,PWD,Low
+safety sign replace urgent,Fire,Low
+dustbin replace reported,Municipality,Low
+pharmacy expired urgent,Health Department,Medium
+Issue: irregular supply hours,Water,Medium
+Issue: safety sign replace,Fire,Low
+Issue: chemical fire warehouse,Fire,High
+loose connection,Electricity,Medium
+Issue: alarm not working,Fire,Medium
+molestation reported,Police/Traffic,High
+Issue: minor repair,Water,Low
+major pothole accident urgent,PWD,High
+bridge crack structural urgent,PWD,High
+Issue: water pipe leak,Water,Medium
+road damage traffic reported,PWD,High
+no fire extinguisher urgent,Fire,Medium
+maintenance sweep,PWD,Low
+grass cutting,Municipality,Low
+illegal construction urgent,Municipality,High
+Issue: paint fading,Electricity,Low
+Issue: street clean,Municipality,Medium
+open dump hazard reported,Municipality,High
+rash driving school,Police/Traffic,Medium
+tap handle fix,Water,Low
+fire safety audit reported,Fire,Medium
+Issue: street light off,Electricity,Medium
+Issue: dangling wire,Electricity,Medium
+water discolored reported,Water,Medium
+Issue: sanitation training,Health Department,Low
+road damage traffic urgent,PWD,High
+fire residential,Fire,High
+smoke basement urgent,Fire,Medium
+rash driving school reported,Police/Traffic,Medium
+health inspection reported,Health Department,Low
+bulb replacement,Electricity,Low
+manhole cover missing urgent,PWD,High
+Issue: water pipeline rupture,Water,High
+pharmacy expired reported,Health Department,Medium
+Issue: maintenance sweep,PWD,Low
+street light off reported,Electricity,Medium
+Issue: assault victim,Police/Traffic,High
+chemical fire warehouse urgent,Fire,High
+parking mark,Police/Traffic,Low
+Issue: major pothole accident,PWD,High
+paint fading urgent,Electricity,Low
+manhole cover missing reported,PWD,High
+bench repair urgent,Municipality,Low
+grass cutting reported,Municipality,Low
+helmet awareness,Police/Traffic,Low
+tank paint reported,Water,Low
+Issue: tank rupture flood,Water,High
+dustbin overflow urgent,Municipality,Medium
+helmet awareness reported,Police/Traffic,Low
+tree pruning,Municipality,Low
+light battery urgent,Fire,Low
+water pipe leak urgent,Water,Medium
+Issue: live wire on road,Electricity,High
+signal broken jam reported,Police/Traffic,Medium
+building fire trapped urgent,Fire,High
+sign faded urgent,PWD,Low
+old line replace,Water,Low
+divider damaged reported,PWD,Medium
+Issue: tree pruning,Municipality,Low
+Issue: light battery,Fire,Low
+electrical burning,Fire,Medium
+encroachment road reported,Municipality,High
+meter servicing urgent,Water,Low
+Issue: clinic calibration,Health Department,Low
+short circuit fire risk urgent,Electricity,High
+chemical fire warehouse,Fire,High
+food unhygienic reported,Health Department,High
+Issue: tap handle fix,Water,Low
+Issue: tank paint,Water,Low
+Issue: pole tilt,Electricity,Low
+Issue: short circuit fire risk,Electricity,High
+hospital power outage,Electricity,High
+path uneven falls,PWD,Medium
+building fire trapped reported,Fire,High
+pole tilt,Electricity,Low
+Issue: malaria cases,Health Department,Medium
+beautification,Municipality,Low
+exit door repair reported,Fire,Low
+crack in box,Electricity,Low
+sewage overflow urgent,Municipality,High
+Issue: water supply cut,Water,High
+old line replace reported,Water,Low
+robbery incident urgent,Police/Traffic,High
+signal broken jam,Police/Traffic,Medium
+Issue: sewage overflow,Municipality,High
+short circuit fire risk,Electricity,High
+dusty fixture urgent,Electricity,Low
+Issue: no fire extinguisher,Fire,Medium

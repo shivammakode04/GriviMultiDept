@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin HQ | {{ user.city }}</title>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        .sidebar-grad { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); }
+        .glass-card { background: white; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-radius: 1rem; }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; color: #3b82f6; }
+        #adminMap { height: 350px; width: 100%; border-radius: 0 0 1rem 1rem; }
+        [x-cloak] { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans antialiased flex h-screen overflow-hidden" x-data="{ tab: 'dash' }">
+
+    <aside class="w-72 sidebar-grad text-slate-300 flex flex-col shadow-2xl z-20">
+        <div class="p-6 border-b border-slate-700/50 flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg"><i class="fas fa-building"></i></div>
+            <div><h1 class="text-xl font-bold text-white tracking-wide">Civic AI</h1><p class="text-[10px] uppercase tracking-wider text-slate-400">{{ user.department_name }} • {{ user.city }}</p></div>
+        </div>
+        <nav class="p-4 space-y-2 flex-1">
+            <a @click="tab='dash'; setTimeout(initMap, 300)" :class="tab=='dash'?'active bg-slate-800 text-white':''" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-slate-800 hover:text-white transition"><i class="fas fa-th-large w-5"></i> Dashboard</a>
+            <a @click="tab='cases'" :class="tab=='cases'?'active bg-slate-800 text-white':''" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-slate-800 hover:text-white transition"><i class="fas fa-folder-open w-5"></i> Active Cases <span class="ml-auto bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">{{ active_count }}</span></a>
+            <a @click="tab='history'" :class="tab=='history'?'active bg-slate-800 text-white':''" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-slate-800 hover:text-white transition"><i class="fas fa-history w-5"></i> History <span class="ml-auto bg-slate-700 text-white text-[10px] px-2 py-0.5 rounded-full">{{ complaints.count }}</span></a>
+            <a @click="tab='feedback'" :class="tab=='feedback'?'active bg-slate-800 text-white':''" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-slate-800 hover:text-white transition"><i class="fas fa-comments w-5"></i> Feedback <span class="ml-auto bg-green-600 text-white text-[10px] px-2 py-0.5 rounded-full" id="feedback-badge">0</span></a>
+            <a href="{% url 'profile_view' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-slate-800 hover:text-white transition"><i class="fas fa-user-cog w-5"></i> Settings</a>
+        </nav>
+        <div class="p-4 bg-slate-900/50 border-t border-slate-700 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-slate-700 border border-slate-500 flex items-center justify-center font-bold text-white">{{ user.username.0|upper }}</div>
+            <div class="overflow-hidden"><p class="text-sm font-bold text-white truncate">{{ user.username }}</p><p class="text-[10px] text-slate-400">Online</p></div>
+            <a href="{% url 'user_logout' %}" class="ml-auto text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto">
+        <header class="bg-white/80 backdrop-blur border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-30">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800 capitalize" x-text="tab == 'dash' ? 'Command Center' : tab == 'cases' ? 'Active Case Management' : tab == 'history' ? 'Complaint History' : 'Feedback Analysis'"></h2>
+                <p class="text-xs text-slate-400 mt-1" x-text="`Last updated: ${new Date().toLocaleString()}`"></p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg border border-blue-100 text-xs font-bold flex items-center gap-2"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> {{ user.city }} Live</div>
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open=!open" class="text-slate-500 hover:text-blue-600 text-xl relative"><i class="fas fa-bell"></i>{% if unread_count %}<span class="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full"></span>{% endif %}</button>
+                    <div x-show="open" @click.outside="open=false" class="absolute right-0 mt-3 w-72 bg-white shadow-xl border rounded-xl p-2 z-50">
+                        <div class="px-3 py-2 border-b text-xs font-bold text-slate-500 uppercase">Notifications</div>
+                        {% for n in notifs %}<div class="text-xs p-3 hover:bg-slate-50 border-b last:border-0">{{ n.message }}</div>{% empty %}<div class="text-xs p-4 text-center text-slate-400">All clear</div>{% endfor %}
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8 max-w-7xl mx-auto space-y-8">
+            <div x-show="tab === 'dash'" x-cloak class="space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="glass-card p-6"><p class="text-xs font-bold text-slate-400 uppercase">Pending Cases</p><h3 class="text-3xl font-extrabold text-slate-800 mt-2">{{ complaints.count }}</h3></div>
+                    <div class="glass-card p-6"><p class="text-xs font-bold text-slate-400 uppercase">Avg Resolution Rate</p><h3 class="text-3xl font-extrabold text-green-500 mt-2">{{ resolved_percentage }}% <span class="text-lg text-slate-400">✓</span></h3></div>
+                    <div class="col-span-2 glass-card p-6 relative overflow-hidden bg-gradient-to-r from-rose-500 to-pink-600 text-white">
+                        <div class="relative z-10">
+                            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-fire-alt animate-pulse"></i> Critical Hotspots</h3>
+                            <div class="flex gap-2 mt-3 overflow-x-auto">
+                                {% for h in hotspots|slice:":3" %}
+                                <div class="bg-black/20 px-3 py-2 rounded-lg border border-white/10"><p class="text-[10px] opacity-75">{{ h.pincode }}</p><p class="font-bold text-sm">{{ h.location_name }}</p><span class="text-[10px] bg-white/20 px-1 rounded">{{ h.total }} Issues</span></div>
+                                {% empty %}<p class="text-sm opacity-80">No critical zones detected.</p>{% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                        <h3 class="font-bold text-slate-700 flex items-center gap-2"><i class="fas fa-map-marked-alt text-blue-500"></i> Operational Map</h3>
+                        <button onclick="focusCity()" class="text-xs bg-white border px-3 py-1.5 rounded-lg font-bold text-slate-600 hover:bg-slate-50">Focus City</button>
+                    </div>
+                    <div id="adminMap"></div>
+                </div>
+            </div>
+
+            <div x-show="tab === 'cases'" x-cloak>
+                <div class="glass-card overflow-hidden">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-slate-50 text-slate-500 font-semibold border-b"><tr><th class="px-6 py-4">Ticket</th><th class="px-6 py-4">User Details</th><th class="px-6 py-4">Status</th><th class="px-6 py-4">Controls</th></tr></thead>
+                        <tbody class="divide-y divide-slate-100">
+                            {% for c in complaints %}
+                            {% if c.status != 'Closed' %}
+                            <tr class="hover:bg-slate-50 transition" x-data="{ transfer: false }">
+                                <td class="px-6 py-4">
+                                    <span class="inline-block bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold mb-1">#{{ c.ticket_id }}</span>
+                                    <p class="font-bold text-slate-800">{{ c.description|truncatechars:50 }}</p>
+                                    <p class="text-xs text-slate-400 mt-0.5"><i class="fas fa-map-pin mr-1"></i>{{ c.location_name }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">{{ c.user.username.0|upper }}</div>
+                                        <div><p class="font-bold text-xs">{{ c.user.username }}</p><p class="text-[10px] text-slate-500">{{ c.user.phone|default:"No Phone" }}</p></div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-bold {% if c.priority == 'High' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">{{ c.priority }}</span></td>
+                                <td class="px-6 py-4">
+                                    <div x-show="!transfer" class="flex flex-col gap-2 items-start">
+                                        {% if c.status == 'Pending' %}
+                                        <a href="{% url 'mark_solved' c.id %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-sm transition w-24 text-center">Resolve</a>
+                                        <button @click="transfer=true" class="text-[10px] text-slate-400 hover:text-blue-600 underline">Wrong Dept?</button>
+                                        {% else %}
+                                        <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-lg border border-yellow-100">Waiting Verify</span>
+                                        {% endif %}
+                                    </div>
+                                    <div x-show="transfer" class="bg-white border p-2 rounded shadow-lg absolute z-10 w-48">
+                                        <form action="{% url 'transfer_complaint' c.id %}" method="POST">{% csrf_token %}<p class="text-[10px] font-bold text-slate-400 mb-1">TRANSFER TO:</p><select name="new_department" class="w-full text-xs border rounded p-1 mb-2"><option>Municipal</option><option>Police</option><option>Electricity</option><option>Water</option><option>Health</option></select><div class="flex gap-2"><button class="bg-slate-800 text-white text-xs px-2 py-1 rounded flex-1">Move</button><button type="button" @click="transfer=false" class="text-red-500 text-xs px-1"><i class="fas fa-times"></i></button></div></form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div x-show="tab === 'history'" x-cloak>
+                <div class="glass-card overflow-hidden">
+                    <div class="px-6 py-4 bg-slate-50 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-700 flex items-center gap-2"><i class="fas fa-history text-blue-500"></i> Complete Complaint History</h3>
+                        <p class="text-xs text-slate-500 mt-1">All complaints for {{ user.department_name }} in {{ user.city }} (including closed cases)</p>
+                    </div>
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-slate-50 text-slate-500 font-semibold border-b"><tr><th class="px-6 py-4">Ticket</th><th class="px-6 py-4">Description</th><th class="px-6 py-4">Priority</th><th class="px-6 py-4">Status</th><th class="px-6 py-4">Filed By</th><th class="px-6 py-4">Date</th><th class="px-6 py-4">Resolution</th></tr></thead>
+                        <tbody class="divide-y divide-slate-100">
+                            {% for c in complaints %}
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="px-6 py-4">
+                                    <span class="inline-block bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold">#{{ c.ticket_id }}</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="font-semibold text-slate-800">{{ c.description|truncatechars:50 }}</p>
+                                    <p class="text-xs text-slate-500 mt-0.5"><i class="fas fa-map-pin mr-1"></i>{{ c.location_name }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold {% if c.priority == 'High' %}bg-red-100 text-red-700{% elif c.priority == 'Medium' %}bg-yellow-100 text-yellow-700{% else %}bg-green-100 text-green-700{% endif %}">
+                                        {{ c.priority }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold {% if c.status == 'Pending' %}bg-blue-100 text-blue-700{% elif c.status == 'Solved' %}bg-purple-100 text-purple-700{% else %}bg-slate-100 text-slate-700{% endif %}">
+                                        {{ c.status }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs">{{ c.user.username.0|upper }}</div>
+                                        <span class="text-slate-700 font-semibold">@{{ c.user.username }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-slate-600 text-xs">{{ c.created_at|date:"M d, Y" }}</td>
+                                <td class="px-6 py-4">
+                                    {% if c.resolution %}
+                                        {% if c.resolution == 'Fully Resolved' %}
+                                            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">✅ {{ c.resolution }}</span>
+                                        {% elif c.resolution == 'Partially Resolved' %}
+                                            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">⚠️ {{ c.resolution }}</span>
+                                        {% else %}
+                                            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">❌ {{ c.resolution }}</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-slate-400 text-xs">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center">
+                                    <i class="fas fa-inbox text-5xl text-slate-200 mb-4 block"></i>
+                                    <p class="text-slate-500 font-semibold">No complaints found for {{ user.department_name }}</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div x-show="tab === 'feedback'" x-cloak>
+                <div class="glass-card overflow-hidden">
+                    <div class="px-6 py-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-star text-yellow-500"></i> User Feedback & Ratings</h3>
+                        <p class="text-xs text-slate-500 mt-1">Feedback from users on complaint resolutions in {{ user.department_name }}</p>
+                    </div>
+                    
+                    <!-- FEEDBACK STATS -->
+                    <div class="grid grid-cols-4 gap-4 p-6 bg-slate-50 border-b border-slate-100">
+                        <div class="glass-card p-4">
+                            <p class="text-xs font-bold text-slate-500 uppercase">Total Feedback</p>
+                            <h3 class="text-3xl font-extrabold text-slate-800 mt-2">0</h3>
+                        </div>
+                        <div class="glass-card p-4">
+                            <p class="text-xs font-bold text-slate-500 uppercase">Avg Rating</p>
+                            <h3 class="text-3xl font-extrabold text-yellow-500 mt-2">4.2★</h3>
+                        </div>
+                        <div class="glass-card p-4">
+                            <p class="text-xs font-bold text-slate-500 uppercase">Fully Resolved</p>
+                            <h3 class="text-3xl font-extrabold text-green-600 mt-2">85%</h3>
+                        </div>
+                        <div class="glass-card p-4">
+                            <p class="text-xs font-bold text-slate-500 uppercase">User Satisfaction</p>
+                            <h3 class="text-3xl font-extrabold text-blue-600 mt-2">92%</h3>
+                        </div>
+                    </div>
+
+                    <!-- FEEDBACK TABLE -->
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-slate-50 text-slate-500 font-semibold border-b"><tr><th class="px-6 py-4">Ticket</th><th class="px-6 py-4">User</th><th class="px-6 py-4">Rating</th><th class="px-6 py-4">Resolution</th><th class="px-6 py-4">Feedback</th><th class="px-6 py-4">Submitted</th></tr></thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr class="hover:bg-slate-50 transition">
+                                <td colspan="6" class="px-6 py-12 text-center">
+                                    <i class="fas fa-inbox text-5xl text-slate-200 mb-4 block"></i>
+                                    <p class="text-slate-500 font-semibold">No feedback received yet</p>
+                                    <p class="text-xs text-slate-400 mt-1">Users will leave feedback after complaints are resolved</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let map;
+        function initMap() {
+            if(map) { map.invalidateSize(); return; }
+            map = L.map('adminMap').setView([22.7196, 75.8577], 12); 
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            
+            const data = {{ map_data|safe }};
+            let markers = [];
+            data.forEach(d => {
+                if(d.latitude){
+                     const col = d.priority=='High'?'red':'green';
+                     const m = L.circleMarker([d.latitude, d.longitude], {color:col, radius:7, fillOpacity:0.8}).addTo(map)
+                        .bindPopup(`<b>#${d.ticket_id}</b><br>${d.description}<br><span style='font-size:10px;color:gray'>${d.user__username} (${d.user__phone})</span>`);
+                     markers.push(m);
+                }
+            });
+
+            if(markers.length) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds(), {padding:[50,50]});
+            } else {
+                focusCity(); 
+            }
+            setTimeout(()=>map.invalidateSize(), 300);
+        }
+
+        function focusCity() {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q={{ user.city }}`).then(r=>r.json()).then(d=>{if(d.length) map.setView([d[0].lat, d[0].lon], 13);});
+        }
+    </script>
+</body>
+</html>
