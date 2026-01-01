@@ -15,15 +15,19 @@ def send_notif(user, message):
 
 # --- AUTH ---
 def auth_view(request):
-    if request.user.is_authenticated: return redirect('dashboard')
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'login':
             u = request.POST.get('username')
             p = request.POST.get('password')
             user = authenticate(username=u, password=p)
-            if user: login(request, user); return redirect('dashboard')
-            else: return render(request, 'auth.html', {'error': 'Invalid Credentials'})
+            if user:
+                login(request, user)
+                return redirect('dashboard')
+            else:
+                return render(request, 'auth.html', {'error': 'Invalid Credentials'})
         elif action == 'signup':
             try:
                 role = request.POST.get('role')
@@ -58,10 +62,13 @@ def auth_view(request):
                     )
                 login(request, user)
                 return redirect('dashboard')
-            except Exception as e: return render(request, 'auth.html', {'error': str(e)})
+            except Exception as e:
+                return render(request, 'auth.html', {'error': str(e)})
     return render(request, 'auth.html')
 
-def logout_view(request): logout(request); return redirect('auth')
+def logout_view(request):
+    logout(request)
+    return redirect('auth')
 
 # --- PROFILE LOGIC ---
 @login_required
@@ -136,7 +143,6 @@ def dashboard_view(request):
         })
 
     # USER VIEW
-   # --- USER VIEW ---
     else:
         complaints = Complaint.objects.filter(user=user).order_by('-created_at')
         closed_count = complaints.filter(status='Closed').count()
@@ -162,8 +168,12 @@ def dashboard_view(request):
 @login_required
 def submit_complaint(request):
     if request.method == 'POST':
-        desc = request.POST.get('description'); loc = request.POST.get('location_name'); pin = request.POST.get('pincode')
-        img = request.FILES.get('image'); lat = request.POST.get('latitude') or None; lng = request.POST.get('longitude') or None
+        desc = request.POST.get('description')
+        loc = request.POST.get('location_name')
+        pin = request.POST.get('pincode')
+        img = request.FILES.get('image')
+        lat = request.POST.get('latitude') or None
+        lng = request.POST.get('longitude') or None
         
         # Improved AI prediction (confidence not shown to user)
         dept, prio, confidence = ai_bot.predict(desc)
@@ -226,7 +236,8 @@ def transfer_complaint(request, id):
     if request.method == 'POST':
         c = get_object_or_404(Complaint, id=id)
         if request.user.is_department_admin:
-            c.department = request.POST.get('new_department'); c.save()
+            c.department = request.POST.get('new_department')
+            c.save()
     return redirect('dashboard')
 
 @login_required

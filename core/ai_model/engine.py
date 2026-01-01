@@ -100,18 +100,18 @@ class CivicAI:
                     self.model = pickle.load(f)
                 with open(VECTORIZER_PATH, 'rb') as f:
                     self.vectorizer = pickle.load(f)
-                print("✅ AI Engine Loaded from Cache (Improved v2.0)")
+                print("[OK] AI Engine Loaded from Cache (Improved v2.0)")
             else:
                 self._train_model()
         except Exception as e:
-            print(f"⚠️ Cache Load Error: {e}, Training from scratch...")
+            print(f"[WARNING] Cache Load Error: {e}, Training from scratch...")
             self._train_model()
 
     def _train_model(self):
         """Train model from dataset"""
         try:
             if not os.path.exists(CSV_PATH):
-                print("⚠️ Dataset not found.")
+                print("[WARNING] Dataset not found.")
                 return
 
             # Read dataset
@@ -149,13 +149,13 @@ class CivicAI:
             with open(VECTORIZER_PATH, 'wb') as f:
                 pickle.dump(self.vectorizer, f)
             
-            print("✅ AI Engine Trained & Cached (Improved v2.0)")
+            print("[OK] AI Engine Trained & Cached (Improved v2.0)")
             print(f"   - TF-IDF Vectorizer: 5000 features, bigrams enabled")
             print(f"   - RandomForest: 100 trees, max_depth=20")
             print(f"   - Training samples: {len(self.data)}")
             
         except Exception as e:
-            print(f"⚠️ Training Error: {e}")
+            print(f"[ERROR] Training Error: {e}")
 
 
     def predict(self, text, confidence_threshold=0.3):
