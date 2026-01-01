@@ -13,5 +13,8 @@ pip install -r requirements.txt
 echo "📁 Collecting static files..."
 python manage.py collectstatic --noinput || echo "⚠️ Static files collection had issues, continuing..."
 
+# Run database migrations (automatic)
+echo "🗄️ Running database migrations..."
+python manage.py migrate --noinput || echo "⚠️ Migration had issues, check logs"
+
 echo "✅ Build completed successfully!"
-echo "⚠️ Note: Run 'python manage.py migrate' in Render Shell after first deployment"
