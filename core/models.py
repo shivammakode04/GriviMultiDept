@@ -7,7 +7,8 @@ class User(AbstractUser):
     is_department_admin = models.BooleanField(default=False)
     department_name = models.CharField(max_length=50, blank=True, null=True)
     city = models.CharField(max_length=50, default="Indore")
-    is_blocked = models.BooleanField(default=False)  # Added to fix database constraint 
+    is_blocked = models.BooleanField(default=False)  # Added to fix database constraint
+    is_verified = models.BooleanField(default=False)  # Added to fix database constraint 
     
     # Profile Data
     phone = models.CharField(max_length=15, blank=True, null=True)
